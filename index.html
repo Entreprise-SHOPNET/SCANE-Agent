@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>BRAS Security | Enregistrement Agent Sécurisé</title>
+  <!-- Google Fonts + Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0e1625 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef2ff;
+      min-height: 100vh;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    /* Subtle noise texture + security grain */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* GLASS CARD LAYOUT */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      background: rgba(15, 22, 36, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 2rem;
+      border: 1px solid rgba(72, 187, 255, 0.2);
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 255, 0.05) inset;
+      transition: all 0.3s ease;
+    }
+
+    /* LEFT SIDE BRANDING */
+    .brand-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 1rem;
+    }
+
+    .brand-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-logo img {
+      max-width: 220px;
+      width: 100%;
+      filter: drop-shadow(0 8px 20px rgba(0, 200, 255, 0.25));
+      transition: transform 0.3s ease;
+    }
+
+    .brand-logo img:hover {
+      transform: scale(1.02);
+    }
+
+    .title-main {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #FFFFFF, #5bc0ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #9ab3d5;
+      line-height: 1.5;
+      border-left: 3px solid #2c7be5;
+      padding-left: 1rem;
+      margin: 1rem 0 1.8rem 0;
+    }
+
+    .security-badge {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-item {
+      background: rgba(44, 123, 229, 0.15);
+      backdrop-filter: blur(4px);
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(44, 123, 229, 0.4);
+    }
+
+    .badge-item i {
+      color: #3b82f6;
+      font-size: 0.9rem;
+    }
+
+    /* RIGHT SIDE FORM */
+    .form-side {
+      background: rgba(10, 14, 23, 0.7);
+      border-radius: 1.5rem;
+      padding: 1.8rem;
+      border: 1px solid rgba(72, 187, 255, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-header {
+      margin-bottom: 1.8rem;
+      text-align: center;
+    }
+
+    .form-header h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .form-header h2 i {
+      color: #2c7be5;
+      font-size: 1.6rem;
+    }
+
+    .form-header p {
+      color: #8ca3c9;
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.3rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      color: #cbdffc;
+    }
+
+    .form-group label i {
+      width: 1.2rem;
+      color: #2c7be5;
+    }
+
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      background: #0f1422;
+      border: 1.5px solid #232a3f;
+      padding: 0.85rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.95rem;
+      color: #f0f4ff;
+      transition: all 0.25s;
+      font-family: 'Inter', monospace;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus {
+      outline: none;
+      border-color: #2c7be5;
+      box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.2);
+      background: #0b1020;
+    }
+
+    /* File upload custom */
+    .file-upload-area {
+      position: relative;
+      margin-top: 0.3rem;
+    }
+
+    .file-label {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: #101624;
+      border: 1.5px dashed #3a4a6e;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .file-label:hover {
+      background: #172032;
+      border-color: #2c7be5;
+    }
+
+    .file-label i {
+      font-size: 1.5rem;
+      color: #5a7bb5;
+    }
+
+    .file-label span {
+      font-size: 0.85rem;
+      color: #b7c9f0;
+    }
+
+    #photoInput {
+      position: absolute;
+      opacity: 0;
+      width: 0.1px;
+      height: 0.1px;
+    }
+
+    .photo-preview {
+      margin-top: 0.8rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .photo-preview img {
+      max-width: 90px;
+      max-height: 90px;
+      border-radius: 1rem;
+      object-fit: cover;
+      border: 2px solid #2c7be5;
+      background: #0a0f18;
+      padding: 3px;
+      display: none;
+    }
+
+    .required-star::after {
+      content: "*";
+      color: #f97316;
+      margin-left: 4px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(95deg, #1e2b4f, #0f1a32);
+      border: 1px solid #2c7be5;
+      color: white;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 2rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-submit i {
+      font-size: 1.1rem;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(95deg, #2a3f6e, #14223f);
+      border-color: #5bb4ff;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -10px #0f172a;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    .message-area {
+      margin-top: 1.5rem;
+      padding: 0.8rem;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .message-area.success {
+      background: rgba(34, 197, 94, 0.15);
+      border-left: 4px solid #22c55e;
+      color: #bef264;
+      display: flex;
+    }
+
+    .message-area.error {
+      background: rgba(239, 68, 68, 0.15);
+      border-left: 4px solid #ef4444;
+      color: #ffb4b4;
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #5f73a1;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.2rem;
+      }
+      .brand-side {
+        text-align: center;
+        padding-right: 0;
+      }
+      .subtitle {
+        text-align: left;
+      }
+      .security-badge {
+        justify-content: center;
+      }
+      .title-main {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0.8rem;
+      }
+      .form-side {
+        padding: 1.2rem;
+      }
+      .form-group input {
+        padding: 0.7rem 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="main-grid">
+    <!-- LEFT COLUMN : BRANDING + IMAGE -->
+    <div class="brand-side">
+      <div class="brand-logo">
+        <img src="https://www.brassecurity.com/assets/img/vector/jahaj.png" alt="BRAS Security Vector Logo" onerror="this.onerror=null; this.src='https://placehold.co/400x100?text=BRAS+Security';">
+      </div>
+      <div>
+        <h1 class="title-main">BRAS Security</h1>
+        <p style="font-size: 0.95rem; letter-spacing: 1px; font-weight: 500;">Protection & Surveillance Avancée</p>
+        <div class="subtitle">
+          <i class="fas fa-shield-alt" style="margin-right: 6px;"></i> 
+          Enregistrement sécurisé des agents · Cartes nominatives infalsifiables
+        </div>
+        <div class="security-badge">
+          <span class="badge-item"><i class="fas fa-fingerprint"></i> Biométrie intégrée</span>
+          <span class="badge-item"><i class="fas fa-cloud-upload-alt"></i> Cloud sécurisé</span>
+          <span class="badge-item"><i class="fas fa-id-card"></i> Contrôle d'accès</span>
+        </div>
+        <p style="margin-top: 1.5rem; font-size: 0.85rem; color: #88a0cf; line-height: 1.4;">
+          Plateforme officielle d'enregistrement des agents BRAS Security. 
+          Chaque carte est unique et horodatée. Conformité RGPD.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN : FORMULAIRE MODERNE -->
+    <div class="form-side">
+      <div class="form-header">
+        <h2><i class="fas fa-user-plus"></i> Nouvel agent</h2>
+        <p><i class="fas fa-asterisk" style="font-size: 8px; vertical-align: middle;"></i> Champs requis : matricule, nom, poste, numéro de carte</p>
+      </div>
+      
+      <form id="agentForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label><i class="fas fa-qrcode"></i> <span class="required-star">Matricule</span></label>
+          <input type="text" name="matricule" id="matricule" placeholder="ex: BR-2412-AG" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-user-circle"></i> <span class="required-star">Nom complet</span></label>
+          <input type="text" name="nom" id="nom" placeholder="Nom de famille / raison sociale" required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-user-tag"></i> Post-nom (optionnel)</label>
+          <input type="text" name="post_nom" id="post_nom" placeholder="ex: MUBIALA (facultatif)">
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-briefcase"></i> <span class="required-star">Poste / Fonction</span></label>
+          <input type="text" name="poste" id="poste" placeholder="Agent de sécurité, superviseur, etc." required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-id-card"></i> <span class="required-star">Numéro de carte (unique)</span></label>
+          <input type="text" name="numero_carte" id="numero_carte" placeholder="Carte n° : BRA-XXXXX" required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-camera"></i> Photographie d'identité (facultatif)</label>
+          <div class="file-upload-area">
+            <label for="photoInput" class="file-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span id="fileNameDisplay">Cliquez pour télécharger une photo</span>
+            </label>
+            <input type="file" id="photoInput" accept="image/jpeg, image/png, image/jpg" />
+          </div>
+          <div class="photo-preview" id="photoPreviewContainer">
+            <img id="previewImg" src="#" alt="Aperçu photo">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <i class="fas fa-check-circle"></i> Enregistrer l'agent
+        </button>
+        <div id="messageBox" class="message-area"></div>
+      </form>
+    </div>
+  </div>
+  <footer>
+    <i class="fas fa-lock"></i> Données sécurisées &nbsp;|&nbsp; © 2025 BRAS Security - Gestion des cartes professionnelles
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // --- MISE À JOUR : URL ABSOLUE DU BACKEND ---
+    const API_URL = 'https://shopnet-immo-backend.onrender.com/api/agent-cards/create';
+
+    const form = document.getElementById('agentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const photoInput = document.getElementById('photoInput');
+    const fileNameSpan = document.getElementById('fileNameDisplay');
+    const previewImg = document.getElementById('previewImg');
+
+    // ----- APERÇU PHOTO -----
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          showMessage('La photo ne doit pas dépasser 5 Mo', 'error');
+          photoInput.value = '';
+          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
+          previewImg.style.display = 'none';
+          previewImg.src = '#';
+          return;
+        }
+        if (!file.type.startsWith('image/')) {
+          showMessage('Format non supporté. Utilisez JPG ou PNG', 'error');
+          photoInput.value = '';
+          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
+          previewImg.style.display = 'none';
+          return;
+        }
+        fileNameSpan.innerText = file.name.substring(0, 35);
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          previewImg.src = ev.target.result;
+          previewImg.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
+        previewImg.style.display = 'none';
+        previewImg.src = '#';
+      }
+    });
+
+    function showMessage(msg, type) {
+      messageBox.innerHTML = '';
+      const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+      messageBox.innerHTML = `${icon} <span>${msg}</span>`;
+      messageBox.className = `message-area ${type === 'success' ? 'success' : 'error'}`;
+      messageBox.style.display = 'flex';
+      setTimeout(() => {
+        if (messageBox.style.display === 'flex') {
+          messageBox.style.display = 'none';
+        }
+      }, type === 'success' ? 6000 : 7000);
+    }
+
+    function resetMessage() {
+      messageBox.style.display = 'none';
+      messageBox.innerHTML = '';
+    }
+
+    function setLoading(loading) {
+      if (loading) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Traitement sécurisé...';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Enregistrer l\'agent';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resetMessage();
+
+      const matricule = document.getElementById('matricule').value.trim();
+      const nom = document.getElementById('nom').value.trim();
+      const post_nom = document.getElementById('post_nom').value.trim();
+      const poste = document.getElementById('poste').value.trim();
+      const numero_carte = document.getElementById('numero_carte').value.trim();
+
+      if (!matricule) {
+        showMessage('Le matricule est obligatoire', 'error');
+        document.getElementById('matricule').focus();
+        return;
+      }
+      if (!nom) {
+        showMessage('Le nom complet est obligatoire', 'error');
+        document.getElementById('nom').focus();
+        return;
+      }
+      if (!poste) {
+        showMessage('Le poste / fonction est obligatoire', 'error');
+        document.getElementById('poste').focus();
+        return;
+      }
+      if (!numero_carte) {
+        showMessage('Le numéro de carte est obligatoire (unique)', 'error');
+        document.getElementById('numero_carte').focus();
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('matricule', matricule);
+      formData.append('nom', nom);
+      if (post_nom) formData.append('post_nom', post_nom);
+      formData.append('poste', poste);
+      formData.append('numero_carte', numero_carte);
+
+      if (photoInput.files.length > 0) {
+        const file = photoInput.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          showMessage('Image trop volumineuse (max 5 Mo)', 'error');
+          return;
+        }
+        formData.append('photo', file);
+      }
+
+      setLoading(true);
+
+      try {
+        // Utilisation de l'URL absolue du backend
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showMessage(`✅ ${result.message} · ID Agent : ${result.agentId || 'OK'} ${result.photo ? '✓ Photo enregistrée' : ''}`, 'success');
+          form.reset();
+          photoInput.value = '';
+          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
+          previewImg.style.display = 'none';
+          previewImg.src = '#';
+        } else {
+          const errorMsg = result.message || 'Erreur lors de l\'enregistrement';
+          showMessage(`⚠️ ${errorMsg}`, 'error');
+        }
+      } catch (err) {
+        console.error('Erreur réseau/api:', err);
+        let errorText = 'Impossible de contacter le serveur. Vérifiez votre connexion ou que l\'API est accessible.';
+        if (err.message) errorText += ` (${err.message})`;
+        showMessage(`🔒 Erreur serveur : ${errorText}`, 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
