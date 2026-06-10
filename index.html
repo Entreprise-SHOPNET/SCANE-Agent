@@ -1,12 +1,13 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>BRAS Security | Enregistrement Agent Sécurisé</title>
-  <!-- Google Fonts + Font Awesome Icons -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>BRAS Security | Scan carte avec feedback audio</title>
+  <!-- Google Fonts + Font Awesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -17,15 +18,17 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0e1625 100%);
+      background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060e);
       font-family: 'Inter', sans-serif;
-      color: #eef2ff;
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 1.5rem;
       position: relative;
     }
 
-    /* Subtle noise texture + security grain */
+    /* overlay scan lumineux */
     body::before {
       content: "";
       position: fixed;
@@ -33,596 +36,622 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 24px 24px;
+      background: repeating-linear-gradient(0deg, 
+        rgba(0, 255, 255, 0.02) 0px, 
+        rgba(0, 255, 255, 0.02) 2px,
+        transparent 2px,
+        transparent 8px);
       pointer-events: none;
       z-index: 0;
     }
 
     .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      position: relative;
+      max-width: 1200px;
+      width: 100%;
       z-index: 2;
+      position: relative;
     }
 
-    /* GLASS CARD LAYOUT */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 2rem;
-      background: rgba(15, 22, 36, 0.65);
-      backdrop-filter: blur(12px);
-      border-radius: 2rem;
+    /* Glassmorphic card */
+    .scan-panel {
+      background: rgba(8, 14, 26, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 2.5rem;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.1) inset;
       padding: 2rem;
-      border: 1px solid rgba(72, 187, 255, 0.2);
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 255, 0.05) inset;
-      transition: all 0.3s ease;
-    }
-
-    /* LEFT SIDE BRANDING */
-    .brand-side {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-right: 1rem;
-    }
-
-    .brand-logo {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .brand-logo img {
-      max-width: 220px;
-      width: 100%;
-      filter: drop-shadow(0 8px 20px rgba(0, 200, 255, 0.25));
-      transition: transform 0.3s ease;
-    }
-
-    .brand-logo img:hover {
-      transform: scale(1.02);
-    }
-
-    .title-main {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(120deg, #FFFFFF, #5bc0ff);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      font-weight: 400;
-      color: #9ab3d5;
-      line-height: 1.5;
-      border-left: 3px solid #2c7be5;
-      padding-left: 1rem;
-      margin: 1rem 0 1.8rem 0;
-    }
-
-    .security-badge {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .badge-item {
-      background: rgba(44, 123, 229, 0.15);
-      backdrop-filter: blur(4px);
-      padding: 0.5rem 1rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      border: 1px solid rgba(44, 123, 229, 0.4);
-    }
-
-    .badge-item i {
-      color: #3b82f6;
-      font-size: 0.9rem;
-    }
-
-    /* RIGHT SIDE FORM */
-    .form-side {
-      background: rgba(10, 14, 23, 0.7);
-      border-radius: 1.5rem;
-      padding: 1.8rem;
-      border: 1px solid rgba(72, 187, 255, 0.2);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .form-header {
-      margin-bottom: 1.8rem;
-      text-align: center;
-    }
-
-    .form-header h2 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-    }
-
-    .form-header h2 i {
-      color: #2c7be5;
-      font-size: 1.6rem;
-    }
-
-    .form-header p {
-      color: #8ca3c9;
-      font-size: 0.9rem;
-      margin-top: 0.4rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.3rem;
-      position: relative;
-    }
-
-    .form-group label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      font-size: 0.85rem;
-      letter-spacing: 0.3px;
-      color: #cbdffc;
-    }
-
-    .form-group label i {
-      width: 1.2rem;
-      color: #2c7be5;
-    }
-
-    .form-group input, 
-    .form-group select {
-      width: 100%;
-      background: #0f1422;
-      border: 1.5px solid #232a3f;
-      padding: 0.85rem 1rem;
-      border-radius: 1rem;
-      font-size: 0.95rem;
-      color: #f0f4ff;
-      transition: all 0.25s;
-      font-family: 'Inter', monospace;
-    }
-
-    .form-group input:focus, 
-    .form-group select:focus {
-      outline: none;
-      border-color: #2c7be5;
-      box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.2);
-      background: #0b1020;
-    }
-
-    /* File upload custom */
-    .file-upload-area {
-      position: relative;
-      margin-top: 0.3rem;
-    }
-
-    .file-label {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      background: #101624;
-      border: 1.5px dashed #3a4a6e;
-      border-radius: 1rem;
-      padding: 0.8rem;
-      cursor: pointer;
       transition: all 0.2s;
     }
 
-    .file-label:hover {
-      background: #172032;
-      border-color: #2c7be5;
-    }
-
-    .file-label i {
-      font-size: 1.5rem;
-      color: #5a7bb5;
-    }
-
-    .file-label span {
-      font-size: 0.85rem;
-      color: #b7c9f0;
-    }
-
-    #photoInput {
-      position: absolute;
-      opacity: 0;
-      width: 0.1px;
-      height: 0.1px;
-    }
-
-    .photo-preview {
-      margin-top: 0.8rem;
+    .brand-header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      gap: 1rem;
     }
 
-    .photo-preview img {
-      max-width: 90px;
-      max-height: 90px;
-      border-radius: 1rem;
-      object-fit: cover;
-      border: 2px solid #2c7be5;
-      background: #0a0f18;
-      padding: 3px;
-      display: none;
+    .logo {
+      max-height: 65px;
+      filter: drop-shadow(0 4px 12px rgba(0, 160, 255, 0.4));
     }
 
-    .required-star::after {
-      content: "*";
-      color: #f97316;
-      margin-left: 4px;
+    .title-badge h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #ffffff, #5bc0ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
     }
 
-    .btn-submit {
-      width: 100%;
-      background: linear-gradient(95deg, #1e2b4f, #0f1a32);
-      border: 1px solid #2c7be5;
-      color: white;
-      padding: 1rem;
-      font-size: 1rem;
-      font-weight: 600;
+    .title-badge p {
+      color: #89a9e0;
+      font-size: 0.8rem;
+    }
+
+    /* zone scan animée */
+    .scan-area {
+      background: rgba(0, 5, 15, 0.5);
       border-radius: 2rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: all 0.25s;
+      padding: 2rem 1.5rem;
+      margin: 1rem 0 2rem 0;
+      text-align: center;
+      border: 1px solid rgba(46, 125, 255, 0.4);
+      transition: 0.2s;
+    }
+
+    .scan-icon {
+      font-size: 4rem;
+      color: #2c7be5;
+      margin-bottom: 1rem;
+      animation: pulseGlow 1.8s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 0 rgba(44, 123, 229, 0); transform: scale(1);}
+      50% { text-shadow: 0 0 12px #2c7be5, 0 0 8px #0080ff; transform: scale(1.05);}
+      100% { text-shadow: 0 0 0 rgba(44, 123, 229, 0); transform: scale(1);}
+    }
+
+    .scan-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .scan-sub {
+      color: #9bb4dc;
+      font-size: 0.9rem;
+    }
+
+    .scan-laser {
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #2c7be5, #00c6ff, #2c7be5, transparent);
+      margin: 1.2rem auto 0 auto;
+      border-radius: 4px;
+      animation: laserMove 2.2s infinite ease-in-out;
+    }
+
+    @keyframes laserMove {
+      0% { width: 20%; opacity: 0.4; }
+      50% { width: 85%; opacity: 1; }
+      100% { width: 20%; opacity: 0.4; }
+    }
+
+    /* status message */
+    .status-card {
+      background: #0c1122cc;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s;
+    }
+
+    .status-waiting {
+      color: #80b4ff;
+    }
+
+    .status-error {
+      color: #ffaa99;
+      background: rgba(255, 70, 70, 0.15);
+      border-left: 4px solid #ff5e5e;
+    }
+
+    .status-success {
+      color: #b9ffb0;
+      background: rgba(34, 197, 94, 0.12);
+      border-left: 4px solid #2ecc71;
+    }
+
+    /* fiche agent */
+    .agent-card {
+      background: rgba(2, 8, 20, 0.7);
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      margin-top: 1.8rem;
+      border: 1px solid rgba(72, 187, 255, 0.3);
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .agent-card.visible {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .agent-profile {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      border-bottom: 1px solid #2c3e66;
+      padding-bottom: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .agent-photo {
+      width: 100px;
+      height: 100px;
+      background: #0f172a;
+      border-radius: 1.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.7rem;
-      backdrop-filter: blur(4px);
+      overflow: hidden;
+      border: 2px solid #2c7be5;
     }
 
-    .btn-submit i {
-      font-size: 1.1rem;
+    .agent-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .btn-submit:hover {
-      background: linear-gradient(95deg, #2a3f6e, #14223f);
-      border-color: #5bb4ff;
-      transform: translateY(-2px);
-      box-shadow: 0 12px 20px -10px #0f172a;
+    .agent-photo i {
+      font-size: 3rem;
+      color: #5f7bbf;
     }
 
-    .btn-submit:disabled {
-      opacity: 0.7;
-      transform: none;
-      cursor: not-allowed;
+    .agent-name-section h3 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: white;
     }
 
-    .message-area {
-      margin-top: 1.5rem;
-      padding: 0.8rem;
+    .matricule-chip {
+      background: #111a2e;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      display: inline-block;
+      font-family: monospace;
+      margin-top: 0.4rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .info-field {
+      background: #0a1022;
       border-radius: 1rem;
+      padding: 0.8rem;
+    }
+
+    .info-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #7c98cf;
+      margin-bottom: 0.3rem;
+    }
+
+    .info-value {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .assistance-note {
+      margin-top: 1rem;
       font-size: 0.85rem;
-      font-weight: 500;
-      display: none;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 2rem;
+      padding: 0.5rem 1rem;
+      display: inline-flex;
       align-items: center;
       gap: 0.6rem;
-    }
-
-    .message-area.success {
-      background: rgba(34, 197, 94, 0.15);
-      border-left: 4px solid #22c55e;
-      color: #bef264;
-      display: flex;
-    }
-
-    .message-area.error {
-      background: rgba(239, 68, 68, 0.15);
-      border-left: 4px solid #ef4444;
-      color: #ffb4b4;
-      display: flex;
-    }
-
-    .loading-spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 0.6s linear infinite;
-      display: inline-block;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     footer {
       text-align: center;
+      font-size: 0.7rem;
       margin-top: 2rem;
-      font-size: 0.75rem;
-      color: #5f73a1;
+      color: #4d6893;
     }
 
-    @media (max-width: 900px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 1.2rem;
+    @media (max-width: 650px) {
+      .scan-panel {
+        padding: 1.3rem;
       }
-      .brand-side {
+      .agent-profile {
+        flex-direction: column;
         text-align: center;
-        padding-right: 0;
       }
-      .subtitle {
-        text-align: left;
-      }
-      .security-badge {
-        justify-content: center;
-      }
-      .title-main {
-        font-size: 2rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 0.8rem;
-      }
-      .form-side {
-        padding: 1.2rem;
-      }
-      .form-group input {
-        padding: 0.7rem 0.9rem;
+      .scan-title {
+        font-size: 1.3rem;
       }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="main-grid">
-    <!-- LEFT COLUMN : BRANDING + IMAGE -->
-    <div class="brand-side">
-      <div class="brand-logo">
-        <img src="https://www.brassecurity.com/assets/img/vector/jahaj.png" alt="BRAS Security Vector Logo" onerror="this.onerror=null; this.src='https://placehold.co/400x100?text=BRAS+Security';">
-      </div>
-      <div>
-        <h1 class="title-main">BRAS Security</h1>
-        <p style="font-size: 0.95rem; letter-spacing: 1px; font-weight: 500;">Protection & Surveillance Avancée</p>
-        <div class="subtitle">
-          <i class="fas fa-shield-alt" style="margin-right: 6px;"></i> 
-          Enregistrement sécurisé des agents · Cartes nominatives infalsifiables
-        </div>
-        <div class="security-badge">
-          <span class="badge-item"><i class="fas fa-fingerprint"></i> Biométrie intégrée</span>
-          <span class="badge-item"><i class="fas fa-cloud-upload-alt"></i> Cloud sécurisé</span>
-          <span class="badge-item"><i class="fas fa-id-card"></i> Contrôle d'accès</span>
-        </div>
-        <p style="margin-top: 1.5rem; font-size: 0.85rem; color: #88a0cf; line-height: 1.4;">
-          Plateforme officielle d'enregistrement des agents BRAS Security. 
-          Chaque carte est unique et horodatée. Conformité RGPD.
-        </p>
+  <div class="scan-panel">
+    <div class="brand-header">
+      <img class="logo" src="https://www.brassecurity.com/assets/img/vector/jahaj.png" alt="BRAS Security" onerror="this.src='https://placehold.co/200x60?text=BRAS'">
+      <div class="title-badge">
+        <h1><i class="fas fa-shield-alt"></i> BRAS Security</h1>
+        <p>Contrôle d'accès · Scan biométrique</p>
       </div>
     </div>
 
-    <!-- RIGHT COLUMN : FORMULAIRE MODERNE -->
-    <div class="form-side">
-      <div class="form-header">
-        <h2><i class="fas fa-user-plus"></i> Nouvel agent</h2>
-        <p><i class="fas fa-asterisk" style="font-size: 8px; vertical-align: middle;"></i> Champs requis : matricule, nom, poste, numéro de carte</p>
+    <!-- Zone visuelle scan -->
+    <div class="scan-area">
+      <div class="scan-icon">
+        <i class="fas fa-id-card"></i>
       </div>
-      
-      <form id="agentForm" enctype="multipart/form-data">
-        <div class="form-group">
-          <label><i class="fas fa-qrcode"></i> <span class="required-star">Matricule</span></label>
-          <input type="text" name="matricule" id="matricule" placeholder="ex: BR-2412-AG" required autocomplete="off">
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-user-circle"></i> <span class="required-star">Nom complet</span></label>
-          <input type="text" name="nom" id="nom" placeholder="Nom de famille / raison sociale" required>
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-user-tag"></i> Post-nom </label>
-          <input type="text" name="post_nom" id="post_nom" placeholder="ex: MUBIALA (facultatif)">
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-briefcase"></i> <span class="required-star">Poste / Fonction</span></label>
-          <input type="text" name="poste" id="poste" placeholder="Agent de sécurité, superviseur, etc." required>
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-id-card"></i> <span class="required-star">Numéro de carte (unique)</span></label>
-          <input type="text" name="numero_carte" id="numero_carte" placeholder="Carte n° : BRA-XXXXX" required>
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-camera"></i> Photographie d'identité</label>
-          <div class="file-upload-area">
-            <label for="photoInput" class="file-label">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <span id="fileNameDisplay">Cliquez pour télécharger une photo</span>
-            </label>
-            <input type="file" id="photoInput" accept="image/jpeg, image/png, image/jpg" />
-          </div>
-          <div class="photo-preview" id="photoPreviewContainer">
-            <img id="previewImg" src="#" alt="Aperçu photo">
-          </div>
-        </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <i class="fas fa-check-circle"></i> Enregistrer l'agent
-        </button>
-        <div id="messageBox" class="message-area"></div>
-      </form>
+      <div class="scan-title">PRÉSENTEZ VOTRE CARTE</div>
+      <div class="scan-sub">Lecture automatique · Vérification instantanée</div>
+      <div class="scan-laser"></div>
+      <div style="margin-top: 1rem; font-size: 0.7rem; opacity: 0.7;">
+        <i class="fas fa-volume-up"></i> Bip OK / Bip Erreur
+      </div>
     </div>
+
+    <!-- Zone de statut / retour -->
+    <div id="statusMessage" class="status-card status-waiting">
+      <i class="fas fa-circle-notch fa-spin"></i> En attente de lecture carte...
+    </div>
+
+    <!-- Carte résultat agent -->
+    <div id="agentResultCard" class="agent-card">
+      <div class="agent-profile">
+        <div class="agent-photo" id="agentPhotoArea">
+          <i class="fas fa-user-secret"></i>
+        </div>
+        <div class="agent-name-section">
+          <h3 id="agentName">— —</h3>
+          <div class="matricule-chip" id="agentMatriculeDisplay">Matricule : ---</div>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="info-field">
+          <div class="info-label"><i class="fas fa-briefcase"></i> Poste</div>
+          <div class="info-value" id="agentPoste">—</div>
+        </div>
+        <div class="info-field">
+          <div class="info-label"><i class="fas fa-user-tag"></i> Post-nom</div>
+          <div class="info-value" id="agentPostNom">—</div>
+        </div>
+        <div class="info-field">
+          <div class="info-label"><i class="fas fa-id-card"></i> Numéro carte</div>
+          <div class="info-value" id="agentCardNumber">—</div>
+        </div>
+        <div class="info-field">
+          <div class="info-label"><i class="fas fa-calendar"></i> Enregistré le</div>
+          <div class="info-value" id="agentDate">—</div>
+        </div>
+      </div>
+      <div style="text-align: right; margin-top: 1rem; font-size: 0.7rem;">
+        <i class="fas fa-check-circle" style="color:#2c7be5;"></i> Vérification sécurisée
+      </div>
+    </div>
+    <footer>
+      <i class="fas fa-headset"></i> Assistance BRAS Security : <strong>+243 97 87 27 791</strong>
+    </footer>
   </div>
-  <footer>
-    <i class="fas fa-lock"></i> Données sécurisées &nbsp;|&nbsp; © 2025 BRAS Security - Gestion des cartes professionnelles
-  </footer>
 </div>
 
 <script>
-  (function() {
-    // --- MISE À JOUR : URL ABSOLUE DU BACKEND ---
-    const API_URL = 'https://shopnet-immo-backend.onrender.com/api/agent-cards/create';
+  // --- CONFIGURATION API ---
+  const API_BASE = 'https://shopnet-immo-backend.onrender.com';
+  const SEARCH_PATH = '/api/agent-cards/card/';
 
-    const form = document.getElementById('agentForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const messageBox = document.getElementById('messageBox');
-    const photoInput = document.getElementById('photoInput');
-    const fileNameSpan = document.getElementById('fileNameDisplay');
-    const previewImg = document.getElementById('previewImg');
+  // --- GESTION DES SONS (Web Audio API) ---
+  let audioCtx = null;
+  let audioAllowed = false;
 
-    // ----- APERÇU PHOTO -----
-    photoInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) {
-          showMessage('La photo ne doit pas dépasser 5 Mo', 'error');
-          photoInput.value = '';
-          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
-          previewImg.style.display = 'none';
-          previewImg.src = '#';
-          return;
-        }
-        if (!file.type.startsWith('image/')) {
-          showMessage('Format non supporté. Utilisez JPG ou PNG', 'error');
-          photoInput.value = '';
-          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
-          previewImg.style.display = 'none';
-          return;
-        }
-        fileNameSpan.innerText = file.name.substring(0, 35);
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          previewImg.src = ev.target.result;
-          previewImg.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+  // Initialiser l'audio au premier geste utilisateur (touche ou clic)
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      // Démarrer en mode suspendu, on le réveillera plus tard
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          console.log('AudioContext activé');
+          audioAllowed = true;
+        }).catch(e => console.warn);
       } else {
-        fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
-        previewImg.style.display = 'none';
-        previewImg.src = '#';
+        audioAllowed = true;
       }
-    });
+    } catch(e) { console.warn('Web Audio API non supportée', e); }
+  }
 
-    function showMessage(msg, type) {
-      messageBox.innerHTML = '';
-      const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
-      messageBox.innerHTML = `${icon} <span>${msg}</span>`;
-      messageBox.className = `message-area ${type === 'success' ? 'success' : 'error'}`;
-      messageBox.style.display = 'flex';
-      setTimeout(() => {
-        if (messageBox.style.display === 'flex') {
-          messageBox.style.display = 'none';
-        }
-      }, type === 'success' ? 6000 : 7000);
+  // Jouer un bip de succès (tonalité aiguë, courte, 2 bips rapides optionnel? On fait un bip propre)
+  function playSuccessBeep() {
+    if (!audioCtx || !audioAllowed) {
+      // Tentative de réveil
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          playBeepInternal(880, 0.15); // 880 Hz (La5), 150ms
+        }).catch(e=>console.warn);
+        return;
+      }
+      return;
+    }
+    playBeepInternal(880, 0.18); // Fréquence joyeuse 880Hz, durée 180ms
+  }
+
+  // Jouer un bip d'erreur (plus grave, deux tons ou un seul grave)
+  function playErrorBeep() {
+    if (!audioCtx || !audioAllowed) {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          playBeepInternal(320, 0.4); // 320 Hz grave, plus long
+        }).catch(e=>console.warn);
+        return;
+      }
+      return;
+    }
+    playBeepInternal(320, 0.45);
+  }
+
+  // Fonction interne qui génère le son avec oscillateur
+  function playBeepInternal(frequency, durationSec) {
+    if (!audioCtx || audioCtx.state !== 'running') return;
+    const now = audioCtx.currentTime;
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+    oscillator.start();
+    oscillator.stop(now + durationSec);
+  }
+
+  // Fonction pour déclencher l'audio au premier événement clavier / click
+  function enableAudioOnUserInteraction() {
+    if (audioCtx && audioCtx.state === 'running') return;
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().then(() => {
+        audioAllowed = true;
+        console.log('Audio débloqué');
+      }).catch(err => console.warn);
+    } else if (audioCtx) {
+      audioAllowed = true;
+    }
+  }
+
+  // Écouter un clic ou une touche pour débloquer l'audio
+  window.addEventListener('click', enableAudioOnUserInteraction, { once: false });
+  window.addEventListener('keydown', (e) => {
+    // Ne pas débloquer sur chaque touche, mais la première suffit
+    if (!audioAllowed) enableAudioOnUserInteraction();
+  });
+
+  // Éléments DOM
+  const statusDiv = document.getElementById('statusMessage');
+  const agentCardDiv = document.getElementById('agentResultCard');
+  const agentPhotoArea = document.getElementById('agentPhotoArea');
+  const agentNameSpan = document.getElementById('agentName');
+  const agentMatriculeSpan = document.getElementById('agentMatriculeDisplay');
+  const agentPosteSpan = document.getElementById('agentPoste');
+  const agentPostNomSpan = document.getElementById('agentPostNom');
+  const agentCardNumberSpan = document.getElementById('agentCardNumber');
+  const agentDateSpan = document.getElementById('agentDate');
+
+  // Buffer pour accumulation des caractères du lecteur carte
+  let cardBuffer = '';
+  let timeoutHandle = null;
+  const RESET_DELAY_MS = 80;      // délai entre caractères pour considérer la fin de rafale (carte)
+  const ENTER_KEY = 'Enter';
+
+  // Fonction pour afficher un statut
+  function setStatus(type, message) {
+    statusDiv.innerHTML = message;
+    statusDiv.className = 'status-card';
+    if (type === 'error') {
+      statusDiv.classList.add('status-error');
+    } else if (type === 'success') {
+      statusDiv.classList.add('status-success');
+    } else {
+      statusDiv.classList.add('status-waiting');
+    }
+  }
+
+  // Réinitialisation du buffer
+  function resetCardBuffer() {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+      timeoutHandle = null;
+    }
+    cardBuffer = '';
+  }
+
+  // Afficher une erreur avec le message d'assistance ET jouer le son d'erreur
+  function showErrorWithAssistance(customMsg) {
+    const errorText = customMsg || 'Carte non reconnue ou agent introuvable.';
+    setStatus('error', `<i class="fas fa-exclamation-triangle"></i> ${errorText}<br><small style="display:block; margin-top:6px;">📞 Appelez l'assistant : <strong style="font-size:1rem;">+243 97 87 27 791</strong></small>`);
+    agentCardDiv.classList.remove('visible');
+    resetCardBuffer();
+    
+    // JOUER LE BIP D'ERREUR
+    playErrorBeep();
+  }
+
+  // Formater date MySQL
+  function formatDate(dateStr) {
+    if (!dateStr) return 'Non disponible';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+    } catch(e) { return dateStr; }
+  }
+
+  // Afficher les données de l'agent dans la fiche et jouer bip succès
+  function displayAgentData(agent, scannedCardNumber) {
+    let fullName = agent.nom || 'Agent';
+    if (agent.post_nom && agent.post_nom.trim() !== '') {
+      fullName += ` ${agent.post_nom.trim()}`;
+    }
+    agentNameSpan.textContent = fullName;
+    agentMatriculeSpan.textContent = `Matricule : ${agent.matricule || '---'}`;
+    agentPosteSpan.textContent = agent.poste || 'Non spécifié';
+    agentPostNomSpan.textContent = (agent.post_nom && agent.post_nom.trim()) ? agent.post_nom : '—';
+    agentCardNumberSpan.textContent = scannedCardNumber;
+    agentDateSpan.textContent = formatDate(agent.created_at);
+
+    // Photo
+    agentPhotoArea.innerHTML = '';
+    if (agent.photo_url && agent.photo_url.trim() !== '') {
+      const img = document.createElement('img');
+      img.src = agent.photo_url;
+      img.alt = 'photo agent';
+      img.onerror = () => {
+        agentPhotoArea.innerHTML = '<i class="fas fa-user-slash"></i>';
+      };
+      agentPhotoArea.appendChild(img);
+    } else {
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-id-card';
+      agentPhotoArea.appendChild(icon);
     }
 
-    function resetMessage() {
-      messageBox.style.display = 'none';
-      messageBox.innerHTML = '';
-    }
+    agentCardDiv.classList.add('visible');
+    agentCardDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // JOUER LE BIP DE SUCCÈS
+    playSuccessBeep();
+  }
 
-    function setLoading(loading) {
-      if (loading) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loading-spinner"></span> Traitement sécurisé...';
+  // Appel API pour récupérer agent par numéro de carte
+  async function fetchAgentByCardNumber(cardNumber) {
+    if (!cardNumber || cardNumber.trim() === '') return;
+    const cleanCard = cardNumber.trim();
+    setStatus('waiting', `<i class="fas fa-sync-alt fa-spin"></i> Vérification de la carte ${cleanCard}...`);
+
+    try {
+      const url = `${API_BASE}${SEARCH_PATH}${encodeURIComponent(cleanCard)}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.status === 404) {
+        const errorJson = await response.json().catch(() => ({}));
+        const msg = errorJson.message || 'Aucun agent associé à cette carte.';
+        showErrorWithAssistance(`❌ ${msg}`);
+        return;
+      }
+
+      if (!response.ok) {
+        let errMsg = `Erreur serveur (${response.status})`;
+        try {
+          const errData = await response.json();
+          if (errData.message) errMsg = errData.message;
+        } catch(e) {}
+        showErrorWithAssistance(`⚠️ ${errMsg}`);
+        return;
+      }
+
+      const data = await response.json();
+      if (data.success && data.agent) {
+        // Succès : afficher la fiche + bip OK
+        setStatus('success', `<i class="fas fa-check-circle"></i> Carte valide · Bienvenue ${data.agent.nom || 'Agent'}`);
+        displayAgentData(data.agent, cleanCard);
       } else {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Enregistrer l\'agent';
+        showErrorWithAssistance('Carte non reconnue dans la base BRAS Security.');
       }
+    } catch (err) {
+      console.error('API error:', err);
+      let networkMsg = 'Impossible de contacter le serveur sécurisé. Vérifiez votre réseau.';
+      if (err.message) networkMsg += ` (${err.message})`;
+      showErrorWithAssistance(`🔌 ${networkMsg}`);
     }
+  }
 
-    form.addEventListener('submit', async (e) => {
+  // Traitement du buffer complet
+  function processCompleteScan(rawCode) {
+    if (!rawCode || rawCode.length === 0) return;
+    let cleaned = rawCode.replace(/[\r\n\t]/g, '').trim();
+    if (cleaned.length === 0) return;
+    resetCardBuffer();
+    fetchAgentByCardNumber(cleaned);
+  }
+
+  // Gestion des caractères clavier (lecteur carte)
+  function onCardCharacter(char) {
+    if (char === ENTER_KEY) {
+      if (cardBuffer.length > 0) {
+        processCompleteScan(cardBuffer);
+      } else {
+        resetCardBuffer();
+      }
+      return;
+    }
+    
+    if (char.length === 1 && char.charCodeAt(0) < 32 && char !== '\r') return;
+    cardBuffer += char;
+    
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    timeoutHandle = setTimeout(() => {
+      if (cardBuffer.length > 0) {
+        processCompleteScan(cardBuffer);
+      }
+      timeoutHandle = null;
+    }, RESET_DELAY_MS);
+  }
+
+  // Écoute globale des événements clavier pour capter le lecteur
+  function handleKeyEvent(e) {
+    let key = e.key;
+    if (key === 'Enter') {
       e.preventDefault();
-      resetMessage();
+      onCardCharacter(ENTER_KEY);
+      return;
+    }
+    if (key && key.length === 1) {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      onCardCharacter(key);
+      e.preventDefault();
+    }
+  }
 
-      const matricule = document.getElementById('matricule').value.trim();
-      const nom = document.getElementById('nom').value.trim();
-      const post_nom = document.getElementById('post_nom').value.trim();
-      const poste = document.getElementById('poste').value.trim();
-      const numero_carte = document.getElementById('numero_carte').value.trim();
-
-      if (!matricule) {
-        showMessage('Le matricule est obligatoire', 'error');
-        document.getElementById('matricule').focus();
-        return;
-      }
-      if (!nom) {
-        showMessage('Le nom complet est obligatoire', 'error');
-        document.getElementById('nom').focus();
-        return;
-      }
-      if (!poste) {
-        showMessage('Le poste / fonction est obligatoire', 'error');
-        document.getElementById('poste').focus();
-        return;
-      }
-      if (!numero_carte) {
-        showMessage('Le numéro de carte est obligatoire (unique)', 'error');
-        document.getElementById('numero_carte').focus();
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('matricule', matricule);
-      formData.append('nom', nom);
-      if (post_nom) formData.append('post_nom', post_nom);
-      formData.append('poste', poste);
-      formData.append('numero_carte', numero_carte);
-
-      if (photoInput.files.length > 0) {
-        const file = photoInput.files[0];
-        if (file.size > 5 * 1024 * 1024) {
-          showMessage('Image trop volumineuse (max 5 Mo)', 'error');
-          return;
-        }
-        formData.append('photo', file);
-      }
-
-      setLoading(true);
-
-      try {
-        // Utilisation de l'URL absolue du backend
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-          showMessage(`✅ ${result.message} · ID Agent : ${result.agentId || 'OK'} ${result.photo ? '✓ Photo enregistrée' : ''}`, 'success');
-          form.reset();
-          photoInput.value = '';
-          fileNameSpan.innerText = 'Cliquez pour télécharger une photo';
-          previewImg.style.display = 'none';
-          previewImg.src = '#';
-        } else {
-          const errorMsg = result.message || 'Erreur lors de l\'enregistrement';
-          showMessage(`⚠️ ${errorMsg}`, 'error');
-        }
-      } catch (err) {
-        console.error('Erreur réseau/api:', err);
-        let errorText = 'Impossible de contacter le serveur. Vérifiez votre connexion ou que l\'API est accessible.';
-        if (err.message) errorText += ` (${err.message})`;
-        showMessage(`🔒 Erreur serveur : ${errorText}`, 'error');
-      } finally {
-        setLoading(false);
-      }
-    });
-  })();
+  window.addEventListener('keydown', handleKeyEvent);
+  
+  // Initialisation de l'API audio (silencieuse, sera activée au premier événement)
+  initAudio();
+  
+  // Message d'accueil
+  setStatus('waiting', '<i class="fas fa-qrcode"></i> En attente de lecture carte — Approchez votre badge du lecteur');
+  console.log('Module scan automatique avec feedback audio prêt.');
 </script>
 </body>
 </html>
+
